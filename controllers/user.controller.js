@@ -1,6 +1,7 @@
 const asyncHandler = require("../utils/asyncHandler");
 const ErrorResponse = require("../utils/ErrorResponse");
 const User = require("../models/User");
+const { upload } = require("../utils/s3Upload");
 
 // helper function
 const sendToken = (user, statusCode, res) => {
@@ -22,15 +23,14 @@ const sendToken = (user, statusCode, res) => {
 // @route   POST api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
-  const { name, email, password, profile } = req.body;
-
-  const user = await User.create({
+  const { name, email, password } = req.body;
+  const userObj = new User({
     name,
     email,
     password,
-    profile,
   });
-
+  await upload(req.file, userObj);
+  const user = await userObj.save();
   sendToken(user, 200, res);
 });
 
@@ -49,7 +49,6 @@ exports.login = asyncHandler(async (req, res, next) => {
   if (!user || !(await user.matchPassword(password))) {
     return next(new ErrorResponse("Invalid Credentials", 401));
   }
-
   sendToken(user, 200, res);
 });
 
