@@ -26,12 +26,6 @@ const UserSchema = new mongoose.Schema({
     default:
       "https://pbs.twimg.com/profile_images/926156469577199616/Nh63c33Q_400x400.jpg",
   },
-  retweets: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Tweet",
-    },
-  ],
   createdAt: {
     type: Date,
     default: Date.now(),

@@ -29,7 +29,9 @@ exports.register = asyncHandler(async (req, res, next) => {
     email,
     password,
   });
-  await upload(req.file, userObj);
+  if (req.file) {
+    await upload(req.file, userObj);
+  }
   const user = await userObj.save();
   sendToken(user, 200, res);
 });

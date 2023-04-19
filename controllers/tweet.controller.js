@@ -1,7 +1,6 @@
 const asyncHandler = require("../utils/asyncHandler");
 const ErrorResponse = require("../utils/ErrorResponse");
 const Tweet = require("../models/Tweet");
-const User = require("../models/User");
 
 // @desc    Create tweet
 // @route   POST api/v1/tweet
@@ -61,38 +60,35 @@ exports.likeTweet = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse("Tweet not found", 404));
   }
   if (tweet.likes.includes(req.user._id)) {
-    // if already liked, unlike it use indexof
+    // if already liked, unlike it
     tweet.likes = tweet.likes.filter(
       (id) => id.toString() !== req.user._id.toString()
     );
-    await tweet.save();
-    return res.status(200).json({ success: true, data: tweet });
+    const updatedTweet = await tweet.save();
+    return res.status(200).json({ success: true, data: updatedTweet });
   }
   tweet.likes.push(req.user._id);
-  await tweet.save();
-  res.status(200).json({ success: true, data: tweet });
+  const updatedTweet = await tweet.save();
+  res.status(200).json({ success: true, data: updatedTweet });
 });
 
 // @desc    Retweet tweet
 // @route   PUT api/v1/tweet/:id/retweet
 // @access  Private
 exports.retweetTweet = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
   const tweet = await Tweet.findById(req.params.id);
   if (!tweet) {
     return next(new ErrorResponse("Tweet not found", 404));
   }
-  if (user.retweets.includes(req.params.id)) {
+  if (tweet.retweets.includes(req.user._id)) {
     // if already retweeted, unretweet it
-    user.retweets = user.retweets.filter(
-      (id) => id.toString() !== req.params.id
+    tweet.retweets = tweet.retweets.filter(
+      (id) => id.toString() !== req.user._id.toString()
     );
-    const updatedRetweets = await user.save();
-    req.user = updatedRetweets;
-    return res.status(200).json({ success: true, data: updatedRetweets });
+    const updatedTweet = await tweet.save();
+    return res.status(200).json({ success: true, data: updatedTweet });
   }
-  user.retweets.push(req.params.id);
-  const updatedRetweets = await user.save();
-  req.user = updatedRetweets;
-  res.status(200).json({ success: true, data: updatedRetweets });
+  tweet.retweets.push(req.user._id);
+  const updatedTweet = await tweet.save();
+  res.status(200).json({ success: true, data: updatedTweet });
 });
