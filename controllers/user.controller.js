@@ -23,6 +23,7 @@ const sendToken = (user, statusCode, res) => {
 // @route   POST api/v1/auth/register
 // @access  Public
 exports.register = asyncHandler(async (req, res, next) => {
+  console.log("inside register")
   const { name, email, password } = req.body;
   const userObj = new User({
     name,
