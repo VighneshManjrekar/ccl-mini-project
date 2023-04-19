@@ -35,6 +35,6 @@ exports.upload = async (file, user) => {
     Key: user._id.toString(),
   };
   const getCommand = new GetObjectCommand(params);
-  const url = await getSignedUrl(s3, getCommand, { expiresIn: 2147483647 });
+  const url = await getSignedUrl(s3, getCommand, { expiresIn: 604800 });
   user.profile = url;
 };
